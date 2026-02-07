@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For You ❤️</title>
+    <style>
+        /* --- GENERAL STYLES --- */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            background-color: #ffe6e6; /* Soft Pink Background */
+            min-height: 100vh; /* Allow scrolling if needed */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* --- SCREEN 1: THE CARD (ENVELOPE) --- */
+        #card-screen {
+            display: flex; /* Visible by default */
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100vh;
+            cursor: pointer;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 10;
+            background-color: #ffe6e6;
+        }
+
+        .envelope {
+            background-color: #ff4d4d;
+            width: 280px;
+            height: 180px;
+            border-radius: 10px;
+            position: relative;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: bounce 2s infinite;
+        }
+
+        /* The triangle flap of the envelope */
+        .envelope:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            width: 0;
+            height: 0;
+            border-left: 140px solid transparent;
+            border-right: 140px solid transparent;
+            border-top: 100px solid #ff6666; 
+        }
+
+        .card-text {
+            color: white;
+            font-size: 22px;
+            font-weight: bold;
+            z-index: 2;
+            text-align: center;
+            padding: 10px;
+        }
+
+        .click-hint {
+            margin-top: 30px;
+            color: #d32f2f;
+            font-size: 16px;
+            font-weight: bold;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* --- SCREEN 2: THE VALENTINE QUESTION (Hidden at first) --- */
+        #main-screen {
+            display: none; /* Hidden by default */
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            width: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            color: #d32f2f;
+            font-size: 2rem; /* Slightly smaller for mobile safety */
+            margin: 10px 0 20px 0;
+            line-height: 1.2;
+        }
+
+        img {
+            max-width: 80%; /* Ensures image doesn't overflow screen */
+            width: 250px;
+            height: auto;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap; 
+            width: 100%;
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 18px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: bold;
+            touch-action: manipulation; /* Improves touch response on mobile */
+        }
+
+        .yes-btn {
+            background-color: #4CAF50; /* Green */
+            color: white;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .no-btn {
+            background-color: #f44336; /* Red */
+            color: white;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="card-screen" onclick="openCard()">
+        <div class="envelope">
+            <div class="card-text">
+                💌<br>A question<br>for you...
+            </div>
+        </div>
+        <div class="click-hint">Tap to open</div>
+    </div>
+
+    <div id="main-screen">
+        <img id="mainImg" src="https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExMWl2bGQzODdkdTd0MzFzM2M0N21mZ2t5M2NhZXpuaWw0dGd3eHc1biZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/VbnUQpnihPSIgIXuZv/giphy.gif" alt="Cute Cat">
+        <h1 id="question">Will you be my Valentine?</h1>
+        
+        <div class="buttons">
+            <button class="yes-btn" id="yesBtn" onclick="accept()">Yes</button>
+            <button class="no-btn" id="noBtn" onclick="reject()">No</button>
+        </div>
+    </div>
+
+    <script>
+        // Backup images in case the primary one doesn't load
+        const pleadingImages = [
+            "https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExMWl2bGQzODdkdTd0MzFzM2M0N21mZ2t5M2NhZXpuaWw0dGd3eHc1biZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/VbnUQpnihPSIgIXuZv/giphy.gif",
+            "https://media1.tenor.com/m/f2552Z3148AAAAAC/cat-pleading.gif",
+            "https://media.giphy.com/media/VbnUQpnihPSIgIXuZv/giphy.gif",
+            "https://i.imgur.com/qCto0AG.gif"
+        ];
+        
+        // More cute and funny celebration images
+        const celebrationImages = [
+            "https://media.giphy.com/media/MDJ9IbxxvDUQM/giphy.gif", // Dancing happy cat
+            "https://media.giphy.com/media/1jl173guBKkbvC03rQ/giphy.gif", // Excited happy dog
+            "https://media.giphy.com/media/3o6Zt6ML6BklcajjsA/giphy.gif", // Happy dancing penguin
+            "https://media.giphy.com/media/5GoVLqeAOo6PK/giphy.gif", // Puppy love
+            "https://media.giphy.com/media/UuB5lh1bL1Dl6sVxvW/giphy.gif", // Cute bears hugging
+            "https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExbnVzMWdoa2ZxaTgzamZhZDI1YWdlYWc1N3FsbTNlajF0YXNwbzQyYyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/UuB5lh1bL1Dl6sVxvW/giphy.gif",
+            "https://media.giphy.com/media/yoJC2El7xJkYCadlWE/giphy.gif", // Cute excited animal
+            "https://media.giphy.com/media/26u4cqiYI30juCOGY/giphy.gif", // Happy puppy jumping
+            "https://media1.tenor.com/m/gUiu1zyxfzYAAAAC/bear-kiss-bear-kisses.gif", // Original bear kiss
+            "https://i.pinimg.com/originals/c6/6c/77/c66c77a89ba4f456769c8d8e680c1315.gif" // Happy celebration
+        ];
+        
+        let currentPleadingIndex = 0;
+        let currentCelebrationIndex = 0;
+
+        // Try to load backup image if primary fails
+        function tryNextPleadingImage() {
+            currentPleadingIndex++;
+            if (currentPleadingIndex < pleadingImages.length) {
+                document.getElementById("mainImg").src = pleadingImages[currentPleadingIndex];
+            }
+        }
+        
+        function tryNextCelebrationImage() {
+            currentCelebrationIndex++;
+            if (currentCelebrationIndex < celebrationImages.length) {
+                document.getElementById("mainImg").src = celebrationImages[currentCelebrationIndex];
+            }
+        }
+
+        // 1. Function to open the card
+        function openCard() {
+            document.getElementById('card-screen').style.display = 'none';
+            document.getElementById('main-screen').style.display = 'flex';
+            
+            // Set up error handler for initial image
+            const img = document.getElementById("mainImg");
+            img.onerror = tryNextPleadingImage;
+        }
+
+        // 2. Logic for the No button
+        let scaleFactor = 1;
+        const noTexts = ["Are you sure?", "Really sure?", "Think again!", "Last chance!", "Surely not?", "You might regret this!", "Give it another thought!", "Are you absolutely certain?", "This could be a mistake!", "Have a heart!", "Don't be so cold!", "Change of heart?", "Wouldn't you reconsider?", "Is that your final answer?", "You're breaking my heart ;(", "Plsss? :( You're breaking my heart"];
+        let textIndex = 0;
+
+        function reject() {
+            // Make Yes Button Bigger
+            scaleFactor += 0.3;
+            const yesBtn = document.getElementById("yesBtn");
+            yesBtn.style.transform = `scale(${scaleFactor})`;
+            
+            // Change No Button Text
+            const noBtn = document.getElementById("noBtn");
+            if (textIndex < noTexts.length) {
+                noBtn.innerText = noTexts[textIndex];
+                textIndex++;
+            } else {
+                noBtn.innerText = "Okay...";
+                noBtn.style.display = "none";
+            }
+        }
+
+        // 3. Logic for the Yes button
+        function accept() {
+            const img = document.getElementById("mainImg");
+            img.src = celebrationImages[0];
+            img.onerror = tryNextCelebrationImage;
+            
+            document.getElementById("question").innerText = "Yay! I knew you'd say yes! ❤️";
+            document.querySelector(".buttons").style.display = "none";
+        }
+    </script>
+
+</body>
+</html>
